@@ -24,8 +24,13 @@ export const addNewTask = createAsyncThunk(
 
 export const updateTaskStatus = createAsyncThunk(
   'tasks/updateStatus',
-  async ({ id, updates }) => {
-    return await todoApi.updateTodo(id, updates);
+  async ({ todoId, updates }, { rejectWithValue }) => {
+    try {
+      const response = await todoApi.updateTodo(todoId, updates);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
 );
 
@@ -88,18 +93,18 @@ const taskSlice = createSlice({
       })
       // Update task cases
       .addCase(updateTaskStatus.pending, (state) => {
-        state.loading = true;
+        
         state.error = null;
       })
       .addCase(updateTaskStatus.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.tasks.findIndex(task => task.id === action.payload.id);
+        const index = state.tasks.findIndex(task => task._id === action.payload._id);
         if (index !== -1) {
           state.tasks[index] = action.payload;
         }
       })
       .addCase(updateTaskStatus.rejected, (state, action) => {
-        state.loading = false;
+        
         state.error = action.error.message;
       })
       // Remove task cases

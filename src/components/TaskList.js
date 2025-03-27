@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeTask, updateTaskStatus } from '../store/slices/taskSlice';
+import { removeTask, updateTaskStatus,fetchTasks } from '../store/slices/taskSlice';
 import { Card, Badge, Button, Container, Row, Col, Form, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FaTrash, FaCheck } from 'react-icons/fa';
 
@@ -25,19 +25,28 @@ const TaskList = () => {
   const [deleteError, setDeleteError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [todoToDelete, setTodoToDelete] = useState(null);
-
+  const [updateLoading, setUpdateLoading] = useState(null); // Track which task is being updated
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
   // Add handleToggleCompletion function
   const handleToggleCompletion = async (taskId, currentStatus) => {
     try {
+      setUpdateLoading(taskId); // Set loading state for this specific task
       await dispatch(updateTaskStatus({
-        id: taskId,
-        updates: { completed: !currentStatus }
+        todoId: taskId, // Make sure to use todoId instead of id
+        updates: {
+          completed: !currentStatus
+        }
       })).unwrap();
+      // Refresh the tasks list after successful update
+      await dispatch(fetchTasks());
     } catch (error) {
       console.error('Failed to update task status:', error);
+    } finally {
+      setUpdateLoading(null); // Clear loading state
     }
   };
-
   const handleDeleteClick = (todo) => {
     setTodoToDelete(todo);
     setShowDeleteModal(true);
@@ -93,6 +102,7 @@ const TaskList = () => {
                   type="checkbox"
                   checked={task.completed}
                   onChange={() => handleToggleCompletion(task._id, task.completed)}
+                  disabled={updateLoading === task._id}
                   className="task-checkbox"
                 />
               </Col>
@@ -111,9 +121,13 @@ const TaskList = () => {
                         Completed
                       </Badge>
                     )}
-                    <small className="text-muted ms-2">
-                      ID: {task._id}
-                    </small>
+                    {updateLoading === task._id && (
+                      <Spinner 
+                        animation="border" 
+                        size="sm" 
+                        className="ms-2"
+                      />
+                    )}
                   </div>
                 </div>
               </Col>

@@ -58,6 +58,8 @@ export const todoApi = {
 
   async updateTodo(todoId, updates) {
     try {
+      console.log('Updating todo:', todoId, updates); // Debug log
+      
       const response = await fetch(`${BASE_URL}/${todoId}`, {
         method: 'PUT',
         headers: {
@@ -65,11 +67,22 @@ export const todoApi = {
         },
         body: JSON.stringify(updates),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
-      if (!data.success) throw new Error(data.message || 'Failed to update todo');
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to update todo');
+      }
+
       return data.data;
     } catch (error) {
-      throw new Error(error.message || 'Failed to update todo');
+      console.error('Update error:', error); // Debug log
+      throw new Error(`Failed to update todo: ${error.message}`);
     }
-  }
+  },
 };
