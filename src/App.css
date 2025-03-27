@@ -1,0 +1,51 @@
+.App {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.task-card {
+  transition: all 0.3s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-card.completed {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.progress-section {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-check-input:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+}
+
+.priority-high {
+  border-left: 4px solid #dc3545;
+}
+
+.priority-medium {
+  border-left: 4px solid #ffc107;
+}
+
+.priority-low {
+  border-left: 4px solid #28a745;
+}
